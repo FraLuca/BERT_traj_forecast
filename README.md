@@ -12,7 +12,7 @@ Moreover, model could be train with different level of information on the goal: 
 
 An example of line to run it is:
 
-CUDA_VISIBLE_DEVICES=0 python BERT_with_goal.py --dataset_name eth --name eth --max_epoch 50 --batch_size 128 --data_type 2 --goal_type 2 --verbose 0
+```CUDA_VISIBLE_DEVICES=0 python BERT_with_goal.py --dataset_name eth --name eth --max_epoch 50 --batch_size 128 --data_type 2 --goal_type 2 --verbose 0```
 
 
 
@@ -23,7 +23,7 @@ Then data_type and goal_type can be switched with the same method.
 
 An example of line to run it is:
 
-CUDA_VISIBLE_DEVICES=0 python BERT_quant_with_goal.py --dataset_name eth --name eth --max_epoch 50 --batch_size 128 --num_clusters 1000 --data_type 2 --goal_type 2 --verbose 0
+```CUDA_VISIBLE_DEVICES=0 python BERT_quant_with_goal.py --dataset_name eth --name eth --max_epoch 50 --batch_size 128 --num_clusters 1000 --data_type 2 --goal_type 2 --verbose 0```
 
 ------
 
