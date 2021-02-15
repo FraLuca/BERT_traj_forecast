@@ -2,4 +2,6 @@
 
 ## Folders
 
-**cluster:** classes obtained with k-means algorithm. Those clusters needs to move to quantized/classification approach. Clusters are divided by number of classes (500, 1000) and data type (Speed, Relative Positions)
+**cluster:** classes obtained with k-means algorithm. Those clusters needs to move to quantized/classification approach. Clusters are divided by number of classes (500, 1000) and data type (Speed, Relative Positions);
+
+**dataset:** original ETH-UCY dataset;
