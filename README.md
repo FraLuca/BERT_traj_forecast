@@ -1,7 +1,6 @@
 # BERT for Trajectory Forecasting
 
-======
-
+------
 ## Scripts and Folders
 
 
@@ -26,9 +25,7 @@ An example of line to run it is:
 
 CUDA_VISIBLE_DEVICES=0 python BERT_quant_with_goal.py --dataset_name eth --name eth --max_epoch 50 --batch_size 128 --num_clusters 1000 --data_type 2 --goal_type 2 --verbose 0
 
-
-======
-
+------
 
 **cluster:** classes obtained with k-means algorithm. Those clusters needs to move to quantized/classification approach. Clusters are divided by number of classes (500, 1000) and data type (Speed, Relative Positions);
 
