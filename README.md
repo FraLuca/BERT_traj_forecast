@@ -31,7 +31,7 @@ CUDA_VISIBLE_DEVICES=0 python BERT_quant_with_goal.py --dataset_name eth --name 
 ```
 
 
-+ **BERT_quant_classification_int_pos.py - BERT_regr_classification_int_pos.py** these scripts refers to experiments about understanding if BERT can localize (in time) a checkpoint. Basically we select an intermediate position in the target and we move it in another one. 
++ **BERT_quant_classification_int_pos.py - BERT_regr_classification_int_pos.py** these scripts refer to experiments about understanding if BERT can localize (in time) a checkpoint. Basically we select an intermediate position in the target and we move it in another one. 
 Then we train BERT to classify its original position. Here some examples, for the quantized approach:
 
 ```
