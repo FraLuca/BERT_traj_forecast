@@ -88,7 +88,8 @@ CUDA_VISIBLE_DEVICES=0 python BERT_regr_classification_int_pos.py --dataset_name
 TODO
 
 - uniformare k-means con data-type
-- correggere BERT_with_goal_interm.py 
+- correggere BERT_with_goal_interm.py
+- commenti in BERT_regr_classification_int_pos.py & BERT_quant_classification_int_pos.py
 ```
 
 
