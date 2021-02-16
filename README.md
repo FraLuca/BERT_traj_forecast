@@ -2,7 +2,7 @@
 
 ---
 
-## Scripts and Folders
+## Scripts 
 
 
 **BERT_with_goal.py** main script that train a Regressive BERT for trajectory prediction. 
@@ -30,7 +30,26 @@ An example of line to run it is:
 CUDA_VISIBLE_DEVICES=0 python BERT_quant_with_goal.py --dataset_name eth --name eth --max_epoch 50 --batch_size 128 --num_clusters 1000 --data_type 2 --goal_type 2 --verbose 0
 ```
 
+
+**BERT_quant_classification_int_pos.py - BERT_regr_classification_int_pos.py** these scripts refers to experiments about understanding if BERT can localize (in time) a checkpoint. Basically we select an intermediate position in the target and we move it in another one. 
+Then we train BERT to classify its original position. Here some examples, for the quantized approach:
+
+```
+CUDA_VISIBLE_DEVICES=0 python BERT_quant_classification_int_pos.py --dataset_name eth --max_epoch 50 --batch_size 128 --num_clusters 1000 --data_type 2 --goal_type 1 --verbose 1 --warmup 3 --factor 0.01
+```
+
+and for the regressive one:
+
+```
+CUDA_VISIBLE_DEVICES=0 python BERT_regr_classification_int_pos.py --dataset_name eth --max_epoch 50 --batch_size 128 --data_type 2 --goal_type 1 --verbose 1 --warmup 1 --factor 0.01
+```
+
+
+
+
 ***
+
+## Folders
 
 **cluster:** classes obtained with k-means algorithm. Those clusters needs to move to quantized/classification approach. Clusters are divided by number of classes (500, 1000) and data type (Speed, Relative Positions);
 
