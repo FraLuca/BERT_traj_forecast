@@ -9,7 +9,7 @@
 
 Different inputs can be choosen: *--data_type 0* for Positions, *--data_type 1* for Speed and *--data_type 2* for Relative Positions.
 
-Moreover, model could be train with different level of information on the goal: *--goal_type 0* for No Goal, *--goal_type 1* for True Goal and *--goal_type 2* for Estimated Goal.
+Moreover, model can be train with different level of information on the goal: *--goal_type 0* for No Goal, *--goal_type 1* for True Goal and *--goal_type 2* for Estimated Goal.
 
 An example of line to run it is:
 
