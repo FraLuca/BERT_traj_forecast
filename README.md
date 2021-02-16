@@ -44,13 +44,20 @@ and for the regressive one:
 CUDA_VISIBLE_DEVICES=0 python BERT_regr_classification_int_pos.py --dataset_name eth --max_epoch 50 --batch_size 128 --data_type 2 --goal_type 1 --verbose 1 --warmup 1 --factor 0.01
 ```
 
++ **BERT_with_goal_interm.py** da sistemare;
+
+
++ **baselineUtils.py** script to preprocess data from raw format to pytorch dataset;
+
+
 + **goal_estimator.py** class with model that learns how to estimate the goal;
 
-+ **kmeans.py** with this script you can generate the classes for the different quantized approaches;
 
 + **individual_TF.py** some usefull model functions;
 
-+ **baselineUtils.py** script to preprocess data from raw format to pytorch dataset;
+
++ **kmeans.py** with this script you can generate the classes for the different quantized approaches;
+
 
 + **utils.py** some utility function for visualization.
 
@@ -62,12 +69,16 @@ CUDA_VISIBLE_DEVICES=0 python BERT_regr_classification_int_pos.py --dataset_name
 
 ## Folders
 
-+ **cluster:** classes obtained with k-means algorithm. Those clusters needs to move to quantized/classification approach. Clusters are divided by number of classes (500, 1000) and data type (Speed, Relative Positions);
++ **clusters:** classes obtained with k-means algorithm. Those clusters needs to move to quantized/classification approach. Clusters are divided by number of classes (500, 1000) and data type (Speed, Relative Positions);
 
-+ **dataset:** original ETH-UCY dataset;
+
++ **datasets:** original ETH-UCY dataset;
 
 
 + **kmeans_pytorch:** files for k-means algo;
+
+
++ **results:** folder where each file, with loss and metric, is saved;
 
 
 + **transformer:** files for Transformer and BERT.
