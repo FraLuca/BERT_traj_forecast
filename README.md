@@ -5,7 +5,7 @@
 ## Scripts 
 
 
-**BERT_with_goal.py** main script that train a Regressive BERT for trajectory prediction. 
++ **BERT_with_goal.py** main script that train a Regressive BERT for trajectory prediction. 
 
 Different inputs can be choosen: *--data_type 0* for Positions, *--data_type 1* for Speed and *--data_type 2* for Relative Positions.
 
@@ -19,7 +19,7 @@ CUDA_VISIBLE_DEVICES=0 python BERT_with_goal.py --dataset_name eth --name eth --
 
 
 
-**BERT_quant_with_goal.py** main script that train a Quantized BERT for trajectory prediction. 
++ **BERT_quant_with_goal.py** main script that train a Quantized BERT for trajectory prediction. 
 
 Basically, that is the quantized version of previous script. 
 Then data_type and goal_type can be switched with the same method.
@@ -31,7 +31,7 @@ CUDA_VISIBLE_DEVICES=0 python BERT_quant_with_goal.py --dataset_name eth --name 
 ```
 
 
-**BERT_quant_classification_int_pos.py - BERT_regr_classification_int_pos.py** these scripts refers to experiments about understanding if BERT can localize (in time) a checkpoint. Basically we select an intermediate position in the target and we move it in another one. 
++ **BERT_quant_classification_int_pos.py - BERT_regr_classification_int_pos.py** these scripts refers to experiments about understanding if BERT can localize (in time) a checkpoint. Basically we select an intermediate position in the target and we move it in another one. 
 Then we train BERT to classify its original position. Here some examples, for the quantized approach:
 
 ```
@@ -44,6 +44,17 @@ and for the regressive one:
 CUDA_VISIBLE_DEVICES=0 python BERT_regr_classification_int_pos.py --dataset_name eth --max_epoch 50 --batch_size 128 --data_type 2 --goal_type 1 --verbose 1 --warmup 1 --factor 0.01
 ```
 
++ **goal_estimator.py** class with model that learns how to estimate the goal;
+
++ **kmeans.py** with this script you can generate the classes for the different quantized approaches;
+
++ **individual_TF.py** some usefull model functions;
+
++ **baselineUtils.py** script to preprocess data from raw format to pytorch dataset;
+
++ **utils.py** some utility function for visualization.
+
+
 
 
 
@@ -51,14 +62,22 @@ CUDA_VISIBLE_DEVICES=0 python BERT_regr_classification_int_pos.py --dataset_name
 
 ## Folders
 
-**cluster:** classes obtained with k-means algorithm. Those clusters needs to move to quantized/classification approach. Clusters are divided by number of classes (500, 1000) and data type (Speed, Relative Positions);
++ **cluster:** classes obtained with k-means algorithm. Those clusters needs to move to quantized/classification approach. Clusters are divided by number of classes (500, 1000) and data type (Speed, Relative Positions);
 
-**dataset:** original ETH-UCY dataset;
-
-
-**kmeans_pytorch:** files for k-means algo;
++ **dataset:** original ETH-UCY dataset;
 
 
-**transformer:** files for transformer and BERT;
++ **kmeans_pytorch:** files for k-means algo;
+
+
++ **transformer:** files for Transformer and BERT.
+
+
+```
+TODO
+
+- uniformare k-means con data-type
+- correggere BERT_with_goal_interm.py 
+```
 
 
