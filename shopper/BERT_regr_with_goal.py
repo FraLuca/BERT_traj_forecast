@@ -238,13 +238,14 @@ def main():
                 last_speed=torch.cat((last_speed,last_one),2)
                 net_input=torch.cat((net_input,last_speed),1)
 
-            
+            net_input = torch.nan_to_num(net_input, 0)
+
             # Postional Embedding
             position = torch.arange(0, net_input.shape[1]).repeat(inp.shape[0],1).long().to(device)
             # Sentence Embedding
             token = torch.zeros((inp.shape[0],net_input.shape[1])).long().to(device)
             # Attention Mask for possible padding
-            attention_mask = torch.ones((inp.shape[0], net_input.shape[1])).long().to(device)
+            attention_mask = (~torch.isnan(torch.cat((batch['src'][:,:,idx1:idx2], batch['trg'][:,:,idx1:idx2]), dim=1))*1).long().to(device)
 
             # BERT
             out=model(input_ids=net_input, position_ids=position, token_type_ids=token, attention_mask=attention_mask)
@@ -338,6 +339,7 @@ def main():
                     last_speed=torch.cat((last_speed,last_one),2)
                     net_input=torch.cat((net_input,last_speed),1)
 
+                net_input = torch.nan_to_num(net_input, 0)
 
                 position = torch.arange(0, net_input.shape[1]).repeat(inp.shape[0], 1).long().to(device)
                 token = torch.zeros((inp.shape[0], net_input.shape[1])).long().to(device)
@@ -436,6 +438,7 @@ def main():
                     last_speed=torch.cat((last_speed,last_one),2)
                     net_input=torch.cat((net_input,last_speed),1)
 
+                net_input = torch.nan_to_num(net_input, 0)
 
                 position = torch.arange(0, net_input.shape[1]).repeat(inp.shape[0], 1).long().to(device)
                 token = torch.zeros((inp.shape[0], net_input.shape[1])).long().to(device)
@@ -494,7 +497,7 @@ def main():
                                 'fad_test': fad_test})
     
     save_folder = './results/Regressive/'+'BERT_'+dict_folder_data[args.data_type]+'_'+dict_folder_goal[args.goal_type]+'/'
-    file_name =  'regr_'+args.dataset_name+'_data'+str(args.data_type)+'_goal'+str(args.goal_type)+'_Epoch'+str(args.max_epoch)+'.csv'
+    file_name =  'regr_shopper_data'+str(args.data_type)+'_goal'+str(args.goal_type)+'_Epoch'+str(args.max_epoch)+'.csv'
     df_results.to_csv(save_folder+file_name, index=False)
 
 
