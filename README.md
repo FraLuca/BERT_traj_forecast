@@ -5,7 +5,7 @@
 ## Scripts 
 
 
-+ **BERT_with_goal.py** main script that train a Regressive BERT for trajectory prediction. 
++ **BERT_regr_with_goal.py** main script that train a Regressive BERT for trajectory prediction. 
 
 Different inputs can be choosen: *--data_type 0* for Positions, *--data_type 1* for Speed and *--data_type 2* for Relative Positions.
 
@@ -14,7 +14,7 @@ Moreover, model can be train with different level of information on the goal: *-
 An example of line to run it is:
 
 ```
-CUDA_VISIBLE_DEVICES=0 python BERT_with_goal.py --dataset_name eth --name eth --max_epoch 50 --batch_size 128 --data_type 2 --goal_type 2 --verbose 0
+CUDA_VISIBLE_DEVICES=0 python BERT_regr_with_goal.py --dataset_name eth --name eth --max_epoch 50 --batch_size 128 --data_type 2 --goal_type 2 --verbose 0
 ```
 
 
