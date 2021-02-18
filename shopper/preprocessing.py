@@ -59,7 +59,7 @@ def extract_sequences(threshold, min_seq_time_length, min_num_points, df):
                         seq_idx += 1
                         new_seq_df = pd.concat([new_seq_df, out_df], ignore_index=True, sort=False)
 
-                    curr_seq = []
+                curr_seq = []
             
     return new_seq_df
 
