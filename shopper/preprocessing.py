@@ -23,46 +23,47 @@ def compute_delta_time(x):
 
 
 
-def extract_sequences(threshold, min_seq_time_length, min_num_points, df):
-		
-		# threshold = posizioni più distanti in tempo di questa threshold spezzano la sequenza
-		# min_seq_time_length = selezioniaimo sequenze t.c. il punto finale e iniziale distano almeno min_seq_time_length secondi 
-		# min_num_points = selezioniaimo sequenze t.c. il numero di punti sia almeno min_num_points
-		
-		curr_seq = []
-		seq_idx = 0
+def extract_sequences(threshold, min_seq_time_length, min_num_points):
+    
+    # threshold = posizioni più distanti in tempo di questa threshold spezzano la sequenza
+    # min_seq_time_length = selezioniaimo sequenze t.c. il punto finale e iniziale distano almeno min_seq_time_length secondi 
+    # min_num_points = selezioniaimo sequenze t.c. il numero di punti sia almeno min_num_points
+    
+    curr_seq = []
+    seq_idx = 0
 
-		new_seq_df = pd.DataFrame(columns = ['tag_id', 'time', 'x', 'y', 'description', 'datetime', 'deltatime', 'seq_idx'])
+    new_seq_df = pd.DataFrame(columns = ['tag_id', 'time', 'x', 'y', 'description', 'datetime', 'deltatime', 'seq_idx'])
 
-		
-		for tag_id in tqdm(df['tag_id'].unique()):
-				
-				sub_df = df[df['tag_id'] == tag_id]
-				sub_df = sub_df.sort_values(by='time')
-				sub_df['datetime'] = sub_df['time'].apply(cast_time)
-				sub_df['deltatime'] = sub_df['datetime'].apply(compute_delta_time)
-		
-				for row in range(len(sub_df)-1):
-						if (sub_df.iloc[row+1]['deltatime'] - sub_df.iloc[row]['deltatime']) <= threshold:
-								if len(curr_seq) == 0:
-										curr_seq.append(sub_df.iloc[row])
-										curr_seq.append(sub_df.iloc[row+1])
-								else:
-										curr_seq.append(sub_df.iloc[row+1])
-						else:
-								if len(curr_seq) >= min_num_points:
-										#list_of_seq.append(curr_seq)
-										out_df = pd.DataFrame(curr_seq)
-										if (out_df.iloc[-1]['deltatime'] - out_df.iloc[0]['deltatime']) >= min_seq_time_length:
-												out_df = out_df.drop_duplicates(subset=['datetime'])
-												out_df['seq_idx'] = [seq_idx]*len(out_df)
-												seq_idx += 1
-												new_seq_df = pd.concat([new_seq_df, out_df], ignore_index=True, sort=False)
+    
+    for tag_id in tqdm(df_edeka['tag_id'].unique()):
+        
+        sub_df = df_edeka[df_edeka['tag_id'] == tag_id]
+        sub_df = sub_df.sort_values(by='time')
+        sub_df['datetime'] = sub_df['time'].apply(cast_time)
+        first = sub_df.iloc[0]['datetime']
+        sub_df['deltatime'] = (sub_df['datetime'] - first).dt.total_seconds()
+    
+        for row in range(len(sub_df)-1):
+            if (sub_df.iloc[row+1]['deltatime'] - sub_df.iloc[row]['deltatime']) <= threshold:
+                if len(curr_seq) == 0:
+                    curr_seq.append(sub_df.iloc[row])
+                    curr_seq.append(sub_df.iloc[row+1])
+                else:
+                    curr_seq.append(sub_df.iloc[row+1])
+            else:
+                if len(curr_seq) >= min_num_points:
+                    #list_of_seq.append(curr_seq)
+                    out_df = pd.DataFrame(curr_seq)
+                    if (out_df.iloc[-1]['deltatime'] - out_df.iloc[0]['deltatime']) >= min_seq_time_length:
+                        out_df = out_df.drop_duplicates(subset=['datetime'])
+                        out_df['seq_idx'] = [seq_idx]*len(out_df)
+                        seq_idx += 1
+                        new_seq_df = pd.concat([new_seq_df, out_df], ignore_index=True, sort=False)
 
-								curr_seq = []
-						
-		return new_seq_df
-
+                curr_seq = []
+            
+    return new_seq_df
+    
 
 def pad_missing_values(curr_seq):
 		curr_seq['deltatime'] = curr_seq['deltatime'] - curr_seq['deltatime'].iloc[0]
