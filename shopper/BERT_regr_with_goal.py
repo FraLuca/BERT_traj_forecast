@@ -27,8 +27,7 @@ from sklearn.model_selection import train_test_split
 
 # An example of line to run the script
 #
-# !CUDA_VISIBLE_DEVICES=0 python BERT_with_goal.py --dataset_name eth --name eth --max_epoch 50 --batch_size 128 --data_type 1 --goal_type 0 --verbose 1
-
+# !CUDA_VISIBLE_DEVICES=0 python BERT_regr_with_goal.py --max_epoch 50 --batch_size 128 --data_type 2 --goal_type 1 --max_number_files 1 --verbose 1
 
 def main():
     parser=argparse.ArgumentParser(description='Train the individual regressive BERT model')
@@ -98,6 +97,8 @@ def main():
     if args.cpu or not torch.cuda.is_available():
         device=torch.device("cpu")
 
+    print("\nLoading Data...")
+    start_time = time.time()
     files = os.listdir('./preprocessed')
     full_df = pd.DataFrame(columns=['x', 'y', 'tag_id', 'seq_idx'])
     for f in files[:args.max_number_files]:
@@ -106,9 +107,12 @@ def main():
 
     train, test = train_test_split(full_df['seq_idx'].unique(), test_size = 0.3, random_state = 0)
     test, val = train_test_split(test, test_size = 0.5, random_state = 0)
+    print("Done in %s seconds" % (time.time() - start_time))
 
     ##### DATALOADER CREATION #####
 
+    print("\nCreating Dataset and Dataloader...")
+    start_time = time.time()
     train_dataset = baselineUtils.create_dataset(full_df[full_df['seq_idx'].isin(train)], args.obs, args.preds)
     val_dataset = baselineUtils.create_dataset(full_df[full_df['seq_idx'].isin(val)], args.obs, args.preds)
     test_dataset = baselineUtils.create_dataset(full_df[full_df['seq_idx'].isin(test)], args.obs, args.preds)
@@ -117,7 +121,7 @@ def main():
     val_dl = torch.utils.data.DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True, num_workers=0)
     test_dl = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=0)
 
-
+    print("Done in %s seconds" % (time.time() - start_time))
 
     ##### MODELS INITIALIZATION #####
 
@@ -238,14 +242,15 @@ def main():
                 last_speed=torch.cat((last_speed,last_one),2)
                 net_input=torch.cat((net_input,last_speed),1)
 
-            net_input = torch.Tensor(np.nan_to_num(net_input.numpy(), 0))
+            net_input = torch.Tensor(np.nan_to_num(net_input.cpu().numpy(), 0)).to(device)
 
             # Postional Embedding
             position = torch.arange(0, net_input.shape[1]).repeat(inp.shape[0],1).long().to(device)
             # Sentence Embedding
             token = torch.zeros((inp.shape[0],net_input.shape[1])).long().to(device)
             # Attention Mask for possible padding
-            attention_mask = (~torch.isnan(torch.cat((batch['src'][:,:,idx1:idx2], batch['trg'][:,:,idx1:idx2]), dim=1))*1).long().to(device)
+            attention_mask = (~torch.isnan(torch.cat((batch['src'][:,:,idx1], batch['trg'][:,:,idx1]), dim=1))*1).long().to(device)
+
 
             # BERT
             out=model(input_ids=net_input, position_ids=position, token_type_ids=token, attention_mask=attention_mask)
@@ -255,6 +260,8 @@ def main():
           
             # In debugging mode, check for Input, True and Predicted sequences
             if id_b==0 and args.verbose:
+                print("SEQ_IDX")
+                print(batch['seq_idx'][0])
                 print("INPUT")
                 print(net_input[0,:,:])
                 print("TRUE DATA")
@@ -264,7 +271,8 @@ def main():
 
             
             # MSE to train prediction of the sequence
-            loss_traj = F.pairwise_distance(pred[:,:].contiguous().view(-1, 2), torch.matmul(torch.cat((batch['src'][:,:,idx1:idx2],batch['trg'][:, :,idx1:idx2]),1).contiguous().view(-1, 2).to(device), torch.from_numpy(rot_mat).float().to(device)) ).mean()
+            gt_seq = torch.Tensor(np.nan_to_num(torch.cat((batch['src'][:,:,idx1:idx2], batch['trg'][:, :,idx1:idx2]),1).cpu().numpy(), 0))
+            loss_traj = F.pairwise_distance(pred[:,:].contiguous().view(-1, 2), gt_seq.contiguous().view(-1, 2).to(device) ).mean()
 
             # In case we estimate goal, we add loss_goal (MSE on last position) and kld_loss (to bring closer train and test goal distribution)
             if args.goal_type != 2:
@@ -278,7 +286,7 @@ def main():
             optim.step()
 
             if args.verbose:
-                print("epoch %03i/%03i  frame %04i / %04i loss: %7.4f" % (epoch, args.max_epoch, id_b, len(tr_dl), loss.item()))
+                print("epoch %03i/%03i  iteration %04i / %04i loss: %7.4f" % (epoch, args.max_epoch, id_b, len(tr_dl), loss.item()))
 
             epoch_loss += loss.item()
 
@@ -339,19 +347,20 @@ def main():
                     last_speed=torch.cat((last_speed,last_one),2)
                     net_input=torch.cat((net_input,last_speed),1)
 
-                net_input = torch.Tensor(np.nan_to_num(net_input.numpy(), 0))
+                net_input = torch.Tensor(np.nan_to_num(net_input.cpu().numpy(), 0)).to(device)
 
                 position = torch.arange(0, net_input.shape[1]).repeat(inp.shape[0], 1).long().to(device)
                 token = torch.zeros((inp.shape[0], net_input.shape[1])).long().to(device)
                 # attention_mask = torch.ones((inp.shape[0], net_input.shape[1])).long().to(device)
-                attention_mask = (~torch.isnan(torch.cat((batch['src'][:,:,idx1:idx2], batch['trg'][:,:,idx1:idx2]), dim=1))*1).long().to(device)
+                attention_mask = (~torch.isnan(torch.cat((batch['src'][:,:,idx1], batch['trg'][:,:,idx1]), dim=1))*1).long().to(device)
+                
 
                 out = model(input_ids=net_input, position_ids=position, token_type_ids=token, attention_mask=attention_mask)
 
                 pred = generator(out[0])
 
-
-                loss_traj = F.pairwise_distance(pred[:,:].contiguous().view(-1, 2), torch.matmul(torch.cat((batch['src'][:,:,idx1:idx2],batch['trg'][:, :,idx1:idx2]),1).contiguous().view(-1, 2).to(device), torch.from_numpy(rot_mat).float().to(device)) ).mean()
+                gt_seq = torch.Tensor(np.nan_to_num(torch.cat((batch['src'][:,:,idx1:idx2], batch['trg'][:, :,idx1:idx2]),1).cpu().numpy(), 0))
+                loss_traj = F.pairwise_distance(pred[:,:].contiguous().view(-1, 2), gt_seq.contiguous().view(-1, 2).to(device) ).mean()
 
                 if args.goal_type != 2:
                     loss = loss_traj 
@@ -439,12 +448,12 @@ def main():
                     last_speed=torch.cat((last_speed,last_one),2)
                     net_input=torch.cat((net_input,last_speed),1)
 
-                net_input = torch.Tensor(np.nan_to_num(net_input.numpy(), 0))
+                net_input = torch.Tensor(np.nan_to_num(net_input.cpu().numpy(), 0)).to(device)
 
                 position = torch.arange(0, net_input.shape[1]).repeat(inp.shape[0], 1).long().to(device)
                 token = torch.zeros((inp.shape[0], net_input.shape[1])).long().to(device)
                 # attention_mask = torch.ones((inp.shape[0], net_input.shape[1])).long().to(device)
-                attention_mask = (~torch.isnan(torch.cat((batch['src'][:,:,idx1:idx2], batch['trg'][:,:,idx1:idx2]), dim=1))*1).long().to(device)
+                attention_mask = (~torch.isnan(torch.cat((batch['src'][:,:,idx1], batch['trg'][:,:,idx1]), dim=1))*1).long().to(device)
 
                 out = model(input_ids=net_input, position_ids=position, token_type_ids=token, attention_mask=attention_mask)
 
