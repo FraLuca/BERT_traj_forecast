@@ -238,7 +238,7 @@ def main():
                 last_speed=torch.cat((last_speed,last_one),2)
                 net_input=torch.cat((net_input,last_speed),1)
 
-            net_input = torch.nan_to_num(net_input, 0)
+            net_input = torch.Tensor(np.nan_to_num(net_input.numpy(), 0))
 
             # Postional Embedding
             position = torch.arange(0, net_input.shape[1]).repeat(inp.shape[0],1).long().to(device)
@@ -339,11 +339,12 @@ def main():
                     last_speed=torch.cat((last_speed,last_one),2)
                     net_input=torch.cat((net_input,last_speed),1)
 
-                net_input = torch.nan_to_num(net_input, 0)
+                net_input = torch.Tensor(np.nan_to_num(net_input.numpy(), 0))
 
                 position = torch.arange(0, net_input.shape[1]).repeat(inp.shape[0], 1).long().to(device)
                 token = torch.zeros((inp.shape[0], net_input.shape[1])).long().to(device)
-                attention_mask = torch.zeros((inp.shape[0], net_input.shape[1])).long().to(device)
+                # attention_mask = torch.ones((inp.shape[0], net_input.shape[1])).long().to(device)
+                attention_mask = (~torch.isnan(torch.cat((batch['src'][:,:,idx1:idx2], batch['trg'][:,:,idx1:idx2]), dim=1))*1).long().to(device)
 
                 out = model(input_ids=net_input, position_ids=position, token_type_ids=token, attention_mask=attention_mask)
 
@@ -438,11 +439,12 @@ def main():
                     last_speed=torch.cat((last_speed,last_one),2)
                     net_input=torch.cat((net_input,last_speed),1)
 
-                net_input = torch.nan_to_num(net_input, 0)
+                net_input = torch.Tensor(np.nan_to_num(net_input.numpy(), 0))
 
                 position = torch.arange(0, net_input.shape[1]).repeat(inp.shape[0], 1).long().to(device)
                 token = torch.zeros((inp.shape[0], net_input.shape[1])).long().to(device)
-                attention_mask = torch.zeros((inp.shape[0], net_input.shape[1])).long().to(device)
+                # attention_mask = torch.ones((inp.shape[0], net_input.shape[1])).long().to(device)
+                attention_mask = (~torch.isnan(torch.cat((batch['src'][:,:,idx1:idx2], batch['trg'][:,:,idx1:idx2]), dim=1))*1).long().to(device)
 
                 out = model(input_ids=net_input, position_ids=position, token_type_ids=token, attention_mask=attention_mask)
 
