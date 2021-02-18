@@ -32,8 +32,8 @@ from sklearn.model_selection import train_test_split
 
 def main():
     parser=argparse.ArgumentParser(description='Train the individual regressive BERT model')
-    parser.add_argument('--obs',type=int,default=8)
-    parser.add_argument('--preds',type=int,default=12)
+    parser.add_argument('--obs',type=int,default=40)
+    parser.add_argument('--preds',type=int,default=60)
     parser.add_argument('--emb_size',type=int,default=768)
     #parser.add_argument('--heads',type=int, default=8)
     #parser.add_argument('--layers',type=int,default=6)
