@@ -11,6 +11,7 @@ import torch
 from torch.utils.data import Dataset
 from tqdm.auto import tqdm
 import random
+import scipy
 
 
 class IndividualTfDataset(Dataset):
