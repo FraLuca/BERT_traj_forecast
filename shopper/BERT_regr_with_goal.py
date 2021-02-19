@@ -25,7 +25,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 from sklearn.model_selection import train_test_split
 
-# An example of line to run the script
+# An example of line to run the script #@ciao
 #
 # !CUDA_VISIBLE_DEVICES=0 python BERT_regr_with_goal.py --max_epoch 50 --batch_size 128 --data_type 2 --goal_type 1 --max_number_files 1 --verbose 1
 
