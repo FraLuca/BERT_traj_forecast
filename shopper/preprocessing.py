@@ -23,7 +23,7 @@ def compute_delta_time(x):
 
 
 
-def extract_sequences(threshold, min_seq_time_length, min_num_points):
+def extract_sequences(dataframe, threshold, min_seq_time_length, min_num_points):
     
     # threshold = posizioni più distanti in tempo di questa threshold spezzano la sequenza
     # min_seq_time_length = selezioniaimo sequenze t.c. il punto finale e iniziale distano almeno min_seq_time_length secondi 
@@ -35,9 +35,9 @@ def extract_sequences(threshold, min_seq_time_length, min_num_points):
     new_seq_df = pd.DataFrame(columns = ['tag_id', 'time', 'x', 'y', 'description', 'datetime', 'deltatime', 'seq_idx'])
 
     
-    for tag_id in tqdm(df_edeka['tag_id'].unique()):
+    for tag_id in tqdm(dataframe['tag_id'].unique()):
         
-        sub_df = df_edeka[df_edeka['tag_id'] == tag_id]
+        sub_df = dataframe[dataframe['tag_id'] == tag_id]
         sub_df = sub_df.sort_values(by='time')
         sub_df['datetime'] = sub_df['time'].apply(cast_time)
         first = sub_df.iloc[0]['datetime']
@@ -152,7 +152,7 @@ if __name__=='__main__':
 		if args.preprocess_part == 1:
 
 			df = pd.read_csv('./'+args.dataset_folder+'/'+args.dataset_file+'_dataset.txt', sep=';')
-			seq_df = extract_sequences(dataset = df, threshold=120, min_seq_time_length=10, min_num_points=5)
+			seq_df = extract_sequences(dataset=df, threshold=120, min_seq_time_length=10, min_num_points=5)
 			seq_df.to_csv('./'+args.dataset_folder+'/'+args.dataset_file+'_extracted_sequences.csv', index=False) 
 	
 		else:
